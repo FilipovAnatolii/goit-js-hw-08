@@ -1,9 +1,7 @@
-import * as basicLightbox from 'https://cdn.jsdelivr.net/npm/basiclightbox@5.0.4/dist/basicLightbox.min.js';
-
 const images = [
     {
         preview:
-            'https://cdn.pixabay.com/photo/2019/05/14/16/43/rchids-4202820__480.jpg',
+            'https://cdn.pixabay.com/photo/2019/05/14/16/43/rchids-4202820__340.jpg',
         original:
             'https://cdn.pixabay.com/photo/2019/05/14/16/43/rchids-4202820_1280.jpg',
         description: 'Hokkaido Flower',
@@ -65,10 +63,12 @@ const images = [
         description: 'Lighthouse Coast Sea',
     },
 ];
+
+
 const gallery = document.querySelector('.gallery');
 const markup = images
     .map(
-        ({ preview, original, description }) => `
+        ({preview, original, description}) => `
     <div class="gallery__item">
       <a class="gallery__link" href="${original}">
         <img
@@ -83,6 +83,7 @@ const markup = images
     .join('');
 
 gallery.innerHTML = markup;
+
 gallery.addEventListener('click', event => {
     event.preventDefault();
 
@@ -91,14 +92,31 @@ gallery.addEventListener('click', event => {
 
     const largeImage = target.dataset.source;
 
-    const instance = basicLightbox.create(`
-    <img src="${largeImage}" width="1112" height="640">
-  `);
-    instance.show();
+    const instance = basicLightbox.create(
+        `
+      <div class="modal">
+        <button class="close-btn" aria-label="Закрыть (Esc)">✖</button>
+        <img src="${largeImage}" width="1112" height="640" alt="">
+      </div>
+    `,
+        {
+            onShow: instance => {
+                const root = instance.element();
 
-    document.addEventListener('keydown', e => {
-        if (e.code === 'Escape') {
-            instance.close();
+                root.querySelector('.close-btn')?.addEventListener('click', () => instance.close());
+
+                const onKeyDown = e => {
+                    if (e.code === 'Escape') instance.close();
+                };
+                document.addEventListener('keydown', onKeyDown);
+                root._onKeyDown = onKeyDown;
+            },
+            onClose: instance => {
+                const root = instance.element();
+                if (root._onKeyDown) document.removeEventListener('keydown', root._onKeyDown);
+            }
         }
-    });
+    );
+
+    instance.show();
 });
