@@ -69,7 +69,7 @@ const gallery = document.querySelector('.gallery');
 const markup = images
     .map(
         ({preview, original, description}) => `
-    <div class="gallery-item">
+    <li class="gallery-item">
       <a class="gallery-link" href="${original}">
         <img
           class="gallery-image"
@@ -78,7 +78,7 @@ const markup = images
           alt="${description}"
         />
       </a>
-    </div>`
+    </li>`
     )
     .join('');
 
